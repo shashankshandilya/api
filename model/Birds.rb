@@ -91,7 +91,8 @@ class Birds < Base
 			record = nil
 			raise  if true == id.nil?
 			@mongoBirdsDb[ BIRDS_COLL ].find( :_id => BSON::ObjectId.from_string( id.to_s ) ).each{|doc|
-				doc[ :_id ] = doc[ :_id ].to_s
+				doc[ :id ]  = doc[ :_id ].to_s
+				doc.delete( "_id" )
 				record = doc
 			}
 		rescue Exception => e
