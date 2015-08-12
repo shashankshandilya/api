@@ -9,13 +9,18 @@ class BirdsService
 
   attr_accessor :birdObj
 
+  DB_ERROR_MESSAGE = '{ "database" : "not able to connect to db" }'
   def initialize()
+    begin
+      @birdObj = Birds.new()
+    rescue Exception => e
+      raise DB_ERROR_MESSAGE
+    end
   end
 
   def post( jsonString )
-    birdObj = Birds.new()
-    if false != birdObj.from_json!( jsonString )
-      response = birdObj.save()
+    if false != @birdObj.from_json!( jsonString )
+      response = @birdObj.save()
       if false != response
         return 201, response.to_json
       end
@@ -24,14 +29,12 @@ class BirdsService
   end
 
   def getBirds()
-    birdObj  = Birds.new()
-    response = birdObj.getList()
+    response = @birdObj.getList()
     return 200, response.to_json
   end
 
   def getBird( id )
-    birdObj = Birds.new()
-    response = birdObj.get( id )
+    response = @birdObj.get( id )
     if true == response.nil?
       return 404
     else
@@ -40,8 +43,7 @@ class BirdsService
   end 
 
   def delById( id )
-    birdObj = Birds.new()
-    response = birdObj.del( id )
+    response = @birdObj.del( id )
     if true == response.nil?
       return 404
     else

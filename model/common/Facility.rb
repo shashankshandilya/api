@@ -17,12 +17,7 @@ module Facility
     end
     
     def get_options( server, _db )
-
-      if server[ 'replica_set' ]
-        replica_set = "?replicaSet#{server[ 'replica_set' ]}"
-      end
-      uri = "mongodb://#{server[ 'hosts' ].join(',')}/#{_db}#{replica_set}"
-
+      uri = "mongodb://#{server[ 'hosts' ].join(',')}/#{_db}?connectTimeoutMS=5000&serverSelectionTimeoutMS=5000"
     end
   end
 

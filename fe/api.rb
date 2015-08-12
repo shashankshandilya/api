@@ -7,31 +7,56 @@ require 'json'
 require 'service/BirdsService'
 
 get '/birds' do
-  code, response = BirdsService.new().getBirds()
-  status code
-  content_type :json
-  response
+  begin
+    code, response = BirdsService.new().getBirds()
+    status code
+    content_type :json
+    response
+  rescue Exception => e
+    status 500
+    content_type :text
+    e.message
+  end
+  
 end
 
 get '/birds/:id' do
-  code, response = BirdsService.new().getBird( params['id'] )
-  status code
-  content_type :json
-  response
+  begin
+    code, response = BirdsService.new().getBird( params['id'] )
+    status code
+    content_type :json
+    response
+  rescue Exception => e
+    status 500
+    content_type :text
+    e.message
+  end
 end
 
 # add new birds to DB
 post '/birds' do
-
-  code, response = BirdsService.new().post( request.env["rack.input"].read )
-  status code
-  content_type :json
-  response
+  begin
+    code, response = BirdsService.new().post( request.env["rack.input"].read )
+    status code
+    content_type :json
+    response
+  rescue Exception => e
+    status 500
+    content_type :text
+    e.message
+  end
+  
 
 end
 
 delete '/birds/:id' do
-  code = BirdsService.new().delById( params['id'] )
-  status code
+  begin
+    code = BirdsService.new().delById( params['id'] )
+    status code
+  rescue Exception => e
+    status 500
+    content_type :text
+    e.message
+  end
 end
 

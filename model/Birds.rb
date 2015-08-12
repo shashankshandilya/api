@@ -12,9 +12,15 @@ class Birds < Base
 	BIRDS_COLL = 'birds'
 
 	def initialize()
-		setvisible( false )
-		setadded()
-		@mongoBirdsDb = Facility::MONGO.new().getConn({ 'hosts' => ["127.0.0.1"] }, BIRDS_DB)
+		begin
+			@mongoBirdsDb = Facility::MONGO.new().getConn({ 'hosts' => ["127.0.0.1"] }, BIRDS_DB)
+			pp @mongoBirdsDb
+			setvisible( false )
+			setadded()
+		rescue Exception => e
+			pp "#{e.message}"
+			raise e.message
+		end
 	end
 
 	def validateSave()
@@ -75,23 +81,21 @@ class Birds < Base
 			obj[ :id ] = id.inserted_id.to_s
 			return obj
 		rescue Exception => e
-			pp e.message
+			pp "save #{e.message}"
 		end
 		return false
 	end
 
 	def get( id )
-
-		record = nil
-		return record  if true == id.nil?
-		
 		begin
+			record = nil
+			raise  if true == id.nil?
 			@mongoBirdsDb[ BIRDS_COLL ].find( :_id => BSON::ObjectId.from_string( id.to_s ) ).each{|doc|
 				doc[ :_id ] = doc[ :_id ].to_s
 				record = doc
 			}
 		rescue Exception => e
-			pp e.message
+			pp "get #{e.message}"
 			return record
 		end
 		record
@@ -99,21 +103,21 @@ class Birds < Base
 	end
 
 	def getList()
-		record = []
 		begin
+			record = []
 			@mongoBirdsDb[ BIRDS_COLL ].find().projection( :_id => 1 ).each{|doc|
 				record.push( doc[ :_id ].to_s )
 			}
 		rescue Exception => e
-			pp e.message
+			pp "getList #{e.message}"
 		end
-		return record
+		record
 	end
 
 	def del( id )
-		record = nil
-		return record  if true == id.nil?
 		begin
+			record = nil
+			raise  if true == id.nil?
 			id = @mongoBirdsDb[ BIRDS_COLL ].find( :_id => BSON::ObjectId.from_string( id.to_s ) ).delete_one
 			if id.documents[0]["n"] == 0 
 				return nil 
@@ -121,12 +125,10 @@ class Birds < Base
 				return id.documents[0]["n"]
 			end
 		rescue Exception => e
-			pp e.message
-			return record
+			pp "del #{e.message}"
 		end
 		record
 	end
-
 end
 
 # inputJson = '{ "name" : "owl", "family" : "1232", "continents" : ["Asia", "China"], "visible" : false }'
